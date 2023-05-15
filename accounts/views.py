@@ -104,13 +104,17 @@ class CartView(LoginRequiredMixin ,  View) :
 
         client = razorpay.Client(auth=( settings.RAZOR_PAY_KEY_ID , settings.RAZOR_PAY_KEY_SECRET))
 
-        data = { "amount": sum, "currency": "INR", "receipt": "order_rcptid_11" }
+        data = { "amount": sum,
+                 "currency": "INR",
+                 "receipt": "order_rcptid_11", 
+                 'redirect': reverse('accounts:home') 
+            }
         payment = client.order.create(data=data)
 
         cart.razor_pay_order_id = payment['id']
         cart.save()
 
-        print(payment)
+        # print(payment)  
         context  = {
             'cart' : cart , 'sum' : sum , 'payment' : payment
         }
