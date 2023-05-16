@@ -81,23 +81,30 @@ class AddToCartView(LoginRequiredMixin ,View) :
     def get(self ,request, uid) : 
 
         product = Product.objects.get(uid = uid)
-        cart ,created  = Cart.objects.get_or_create(user = self.request.user , is_paid = False)
-        cartItem = CartItems.objects.create(cart = cart  ,product  =product)
         size =  request.GET.get('size')
-        if size : 
+        
+        if size != 'None' : 
+            cart ,created  = Cart.objects.get_or_create(user = self.request.user , is_paid = False)
+            cartItem = CartItems.objects.create(cart = cart  ,product  =product)
             size_variant =SizeVariant.objects.get(size_name = size)
             cartItem.size_variant = size_variant
-            cartItem.save()
-        
-        messages.success(request ,'Product added to cart successfully')
-        return redirect(request.META.get('HTTP_REFERER'))
+            cartItem.save()        
+            messages.success(request ,'Product added to cart successfully')
+            return redirect(request.META.get('HTTP_REFERER'))
+        else  : 
+            messages.warning(request, "Plese select a size")
+            return redirect(request.META.get('HTTP_REFERER'))
     
 
 class CartView(LoginRequiredMixin ,  View) : 
 
 
     def get(self , request) : 
-        cart = Cart.objects.get(is_paid = False ,user = self.request.user)
+        try  : 
+            cart = Cart.objects.get(is_paid = False ,user = self.request.user)
+        except Cart.DoesNotExist : 
+            messages.warning(request, "No items have been added to cart")
+            return redirect(reverse('home:index'))
         sum = cart.get_cart_total()
         if cart.coupon : 
             sum -= cart.coupon.discount_price
@@ -106,8 +113,7 @@ class CartView(LoginRequiredMixin ,  View) :
 
         data = { "amount": sum,
                  "currency": "INR",
-                 "receipt": "order_rcptid_11", 
-                 'redirect': reverse('accounts:home') 
+                 "receipt": "order_rcptid_11"
             }
         payment = client.order.create(data=data)
 
@@ -122,6 +128,9 @@ class CartView(LoginRequiredMixin ,  View) :
 
     
     def post(self , request) : 
+
+        if request.POST.get('search-value') : 
+            return redirect(reverse('home:index'))
 
         cart = Cart.objects.get(is_paid = False , user = self.request.user)
         coupon = request.POST.get('coupon')  
@@ -156,7 +165,12 @@ class RemoveCartItemView(View) :
     def get(self,request , cartItem_uid) : 
 
         cart_item = CartItems.objects.get(uid = cartItem_uid)
-        cart_item.delete()        
+        cart_item.delete()    
+        cart = Cart.objects.get(user = self.request.user)
+        cart_items_left = CartItems.objects.filter(cart = cart).first()
+        if cart_items_left is None : 
+            messages.warning(request, "No items left in cart")    
+            return redirect(reverse('home:index'))
         return redirect(request.META.get('HTTP_REFERER'))
 
 class RemoveCouponView(View) : 
@@ -172,6 +186,19 @@ class RemoveCouponView(View) :
 
         
         
+class SuccessView(View) : 
+
+    def get(self ,request) : 
+        order_id = request.GET.get('order_id')
+        cart = Cart.objects.get(razor_pay_order_id=order_id)
+        cart.is_paid = True 
+        cart.save()
+        related_cart_items = cart.cart_items.all()
         
-            
+        # Delete each related object manually
+        for related_obj in related_cart_items:
+            print(related_obj)
+            related_obj.delete()
+        messages.success(request, "Payment done successfully")
+        return redirect(reverse('home:index'))
         

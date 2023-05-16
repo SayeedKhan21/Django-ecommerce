@@ -10,8 +10,8 @@
                 <div class="col-lg-8">
                   <div class="p-5">
                     <div class="d-flex justify-content-between align-items-center mb-5">
-                      <h1 class="fw-bold mb-0 text-black">Shopping Cart</h1>
-                      <h6 class="mb-0 text-muted">{{cart.cart_items.count}} items</h6>
+                        <h1 class="fw-bold mb-0 text-black">Shopping Cart</h1>
+                      <h6 class="mb-0 text-muted">{{cart.cart_items.count}}  {{ cart.cart_items.count|pluralize:"item,items" }}</h6>
                     </div>
                     <hr class="my-4">
                     
@@ -54,7 +54,7 @@
                     </div>               
   
                     <h5 class="text-uppercase mb-3">Enter Coupon code</h5>
-                    {% include 'core/alert.html' %}
+                    {% comment %} {% include 'core/alert.html' %} {% endcomment %}
                     <form method = "POST" >
                       {% csrf_token %}
                       <div class="mb-5">
@@ -93,7 +93,7 @@
     <script>
       
     var options = {
-      "key": "rzp_test_51frTomlqWp5B5", // Enter the Key ID generated from the Dashboard
+      "key": "rzp_test_Uu6zbA1uB69XpH", // Enter the Key ID generated from the Dashboard
       "amount": "{{payment.amount}}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
       "currency": "INR",
       "name": "Ecomm",
@@ -102,11 +102,12 @@
       "order_id": "{{payment.id}}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
       "handler": function (response){
 
-      // window.location.href = `http://127.0.0.1:8000/accounts/success/?=razorpay_payment_id =${razor_pay_payment_id}&razorpay_order_id=${razor_pay_order_id}&razorpay_signature=${razor_pay_payment_signature}`
+       window.location.href = `http://127.0.0.1:8000/accounts/success/?order_id={{payment.id}}` 
 
-        alert(response.razorpay_payment_id);
+       /** alert(response.razorpay_payment_id);
         alert(response.razorpay_order_id);
         alert(response.razorpay_signature)
+        **/
       },
       "prefill": {
           "name": "Gaurav Kumar",

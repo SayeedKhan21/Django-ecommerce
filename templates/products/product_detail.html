@@ -3,7 +3,7 @@
 {%  block start %}
 
 <section class="section-content padding-y bg">
-  {% include 'core/alert.html' %}
+  {% comment %} {% include 'core/alert.html' %} {% endcomment %}
     <div class="container">
     
     <!-- ============================ COMPONENT 1 ================================= -->
@@ -57,8 +57,7 @@
       <dt class="col-sm-3">Model#</dt>
       <dd class="col-sm-9">Odsy-1000</dd>
     
-      <dt class="col-sm-3">Color</dt>
-      <dd class="col-sm-9">Brown</dd>
+      
     
       <dt class="col-sm-3">Delivery</dt>
       <dd class="col-sm-9">Russia, USA, and Europe </dd>
@@ -66,18 +65,6 @@
     
     <hr>
         <div class="form-row">
-            <div class="form-group col-md flex-grow-0">
-                <label>Quantity</label>
-                <div class="input-group mb-3 input-spinner">
-                  <div class="input-group-prepend">
-                    <button class="btn btn-light" type="button" id="button-plus"> + </button>
-                  </div>
-                  <input type="text" class="form-control" value="1">
-                  <div class="input-group-append">
-                    <button class="btn btn-light" type="button" id="button-minus"> − </button>
-                  </div>
-                </div>
-            </div> <!-- col.// -->
             {% if product.size.count %}
             <div class="form-group col-md">
                     <label>Select size</label>
@@ -85,7 +72,7 @@
                       {% for size in product.size.all %}
                       
                         <label class="custom-control custom-radio custom-control-inline">
-                          <input type="radio" onchange ="getPrice('{{size.size_name}}')" name="select_size" {% if selected_size == size.size_name %} checked {% endif %} class="custom-control-input">
+                          <input type="radio" id="toggleRadio" onchange ="getPrice('{{size.size_name}}')" name="select_size" {% if selected_size == size.size_name %} checked {% endif %}  class="custom-control-input">
                           <div class="custom-control-label">{{size.size_name}}</div>
                         </label>
     
@@ -110,14 +97,15 @@
     </div>
     </section>
 
-    <script>
+    <script  type='text/javascript'>
         //console.log("here")
         function getPrice(size){
-          // console.log(size)
-          //console.log(window.origin)
-           //console.log(window.location.pathname + `?size=${size}`)
             window.location.href = window.origin+ window.location.pathname + `?size=${size}`
         }
+
+       
+
+        
     </script>
 
 {% endblock %}

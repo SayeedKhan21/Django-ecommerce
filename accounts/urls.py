@@ -8,6 +8,7 @@ from .views import (
     CartView ,
     RemoveCartItemView,
     RemoveCouponView ,
+    SuccessView
 )
 
 app_name = 'accounts'
@@ -20,5 +21,6 @@ urlpatterns = [
     path('add_to_cart/<uuid:uid>' , AddToCartView.as_view() , name = 'add-to-cart') ,
     path('cart/' , CartView.as_view() , name = 'cart') ,
     path('remove-cart-item/<uuid:cartItem_uid>' , RemoveCartItemView.as_view() , name = 'remove-cart-item') ,
-    path('remove-coupon/<uuid:cart_id>' , RemoveCouponView.as_view() ,name = 'remove-coupon')
+    path('remove-coupon/<uuid:cart_id>' , RemoveCouponView.as_view() ,name = 'remove-coupon'),
+    path('success/' , SuccessView.as_view() ,name = 'payment-success'),
 ]
